@@ -65,7 +65,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |v|
     v.memory = 768
     v.cpus = 1
-    v.name = "vm.panic0.test "
+    v.name = "vm.panic0.test"
   end
 
   # ホスト名登録すると自動でhostsに登録されるようにできるので設定する
@@ -107,27 +107,36 @@ Vagrant.configure("2") do |config|
                               o: :nonempty
   end
 
-  # どうしてもreload前に実行しなくてはいけない基本的な設定を実行する
-  config.vm.provision "ansible_local" do |ansible|
+  config.vm.provision "ansible_local", run: "always" do |ansible|
+    ansible.install_mode = "pip"
     ansible.limit = "dev_local"
-    ansible.inventory_path = "./provision/inventory/default.yml"
-    ansible.playbook = "./provision/00_base_setting.yml"
+    ansible.inventory_path = "./provision/hosts/default.yml"
+    ansible.playbook = "./provision/vm_init.yml"
   end
 
   # 一般ユーザーを指定してのマウントを有効にするためにここでリロード
   config.vm.provision :reload
 
+
+  config.vm.provision "shell", run: "always", inline: <<-SHELL
+cat /app/dev.test/.ansible_vault_pass > /tmp/.ansible_vault_pass
+chmod 644 /tmp/.ansible_vault_pass
+#systemctl restart networking.service
+  SHELL
+
   config.vm.provision "ansible_local", run: "always" do |ansible|
     ansible.install_mode = "pip"
     ansible.limit = "dev_local"
-    ansible.inventory_path = "./provision/inventory/default.yml"
-    ansible.playbook = "./provision/01_dev.yml"
+    ansible.inventory_path = "./provision/hosts/default.yml"
+    ansible.playbook = "./provision/base_setting.yml"
+    ansible.vault_password_file = "/tmp/.ansible_vault_pass"
   end
 
   config.vm.provision "ansible_local", run: "always" do |ansible|
     ansible.limit = "dev_local"
     ansible.inventory_path = "./provision/inventory/default.yml"
     ansible.playbook = "./provision/02_dev_service.yml"
+    ansible.vault_password_file = "/tmp/.ansible_vault_pass"
   end
 
   # ansibleでVMの基礎設定行う
