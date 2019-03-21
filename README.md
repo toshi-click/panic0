@@ -29,25 +29,25 @@ homebrew cask install vagrant
 #### 仮想マシンの起動
 ```
 # Windowsの場合
-bin/win/start.bat をダブルクリック
+scripts/win/start.bat をダブルクリック
 # Mac OSXの場合
-bin/mac/start.command をダブルクリック
+scripts/mac/start.command をダブルクリック
 ```
 
 ## 仮想マシンの終了
 ```
 # Windowsの場合
-bin/win/stop.bat をダブルクリック
+scripts/win/stop.bat をダブルクリック
 # Mac OSXの場合
-bin/mac/stop.command をダブルクリック
+scripts/mac/stop.command をダブルクリック
 ```
 
 ## 仮想マシンの再起動
 ```
 # Windowsの場合
-bin/win/restart.bat をダブルクリック
+scripts/win/restart.bat をダブルクリック
 # Mac OSXの場合
-bin/mac/restart.command をダブルクリック
+scripts/mac/restart.command をダブルクリック
 ```
 
 ## 仮想マシンにSSHでアクセスする
