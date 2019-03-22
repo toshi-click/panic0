@@ -52,7 +52,7 @@ Vagrant.configure("2") do |config|
   # PC本体が `host:` 、VMが `guest:` です。
   if Vagrant::Util::Platform.windows? or Vagrant::Util::Platform.wsl?
     # DockerのAPIを実行したいのでポート開放
-    config.vm.network :forwarded_port, host: 2376, guest: 2375
+    config.vm.network :forwarded_port, host: 2373, guest: 2375
     # config.vm.network :forwarded_port, host: 25, guest: 25
     # config.vm.network :forwarded_port, host: 110, guest: 110
   else
@@ -110,7 +110,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "ansible_local", run: "always" do |ansible|
     ansible.install_mode = "pip"
     ansible.limit = "dev_local"
-    ansible.inventory_path = "./provision/hosts/default.yml"
+    ansible.inventory_path = "./provision/inventory/default.yml"
     ansible.playbook = "./provision/vm_init.yml"
   end
 
@@ -119,7 +119,7 @@ Vagrant.configure("2") do |config|
 
 
   config.vm.provision "shell", run: "always", inline: <<-SHELL
-cat /app/dev.test/.ansible_vault_pass > /tmp/.ansible_vault_pass
+cat /vagrant/.ansible_vault_pass > /tmp/.ansible_vault_pass
 chmod 644 /tmp/.ansible_vault_pass
 #systemctl restart networking.service
   SHELL
@@ -127,17 +127,17 @@ chmod 644 /tmp/.ansible_vault_pass
   config.vm.provision "ansible_local", run: "always" do |ansible|
     ansible.install_mode = "pip"
     ansible.limit = "dev_local"
-    ansible.inventory_path = "./provision/hosts/default.yml"
+    ansible.inventory_path = "./provision/inventory/default.yml"
     ansible.playbook = "./provision/base_setting.yml"
     ansible.vault_password_file = "/tmp/.ansible_vault_pass"
   end
 
-  config.vm.provision "ansible_local", run: "always" do |ansible|
-    ansible.limit = "dev_local"
-    ansible.inventory_path = "./provision/inventory/default.yml"
-    ansible.playbook = "./provision/02_dev_service.yml"
-    ansible.vault_password_file = "/tmp/.ansible_vault_pass"
-  end
+  # config.vm.provision "ansible_local", run: "always" do |ansible|
+  #   ansible.limit = "dev_local"
+  #   ansible.inventory_path = "./provision/inventory/default.yml"
+  #   ansible.playbook = "./provision/02_dev_service.yml"
+  #   ansible.vault_password_file = "/tmp/.ansible_vault_pass"
+  # end
 
   # ansibleでVMの基礎設定行う
   config.vm.provision "shell", run: "always", inline: <<-SHELL

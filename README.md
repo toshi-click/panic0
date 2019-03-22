@@ -71,11 +71,29 @@ docker exec -it postgres bash -c "psql -d panic0_db  -h postgres -p 5432 -U post
 docker exec -it django pgrep gunicorn
 docker exec -it django kill -HUP [↑で確認した番号]
 ```
-
-# vagrantでやっているansibleの手実行
+# Ansible関連
+ansible用の暗号化のしかた
 ```
-ansible-playbook -l dev_local -i provision/hosts/panic0.toshi.click.yml provision/01_dev.yml
-ansible-playbook -l dev_local -i provision/hosts/panic0.toshi.click.yml provision/02_dev_service.yml
+# 暗号化したいファイルを暗号化
+ansible-vault encrypt /app/panic0/provision/vars/crypt_vars.yml --vault-pass /tmp/.ansible_vault_pass
+# 暗号化されたファイルの内容を復号化して表示
+ansible-vault view /app/panic0/provision/vars/crypt_vars.yml --vault-pass /tmp/.ansible_vault_pass
+# 暗号化されたファイルを復号化
+ansible-vault decrypt /app/panic0/provision/vars/crypt_vars.yml --vault-pass /tmp/.ansible_vault_pass
+
+# プレイブックを実行する時に--vault-passを指定してパスワードファイルを指定するとkey入力無しで実行可能
+ansible-playbook -l dev_local -i provision/inventory/default.yml provision/base_setting.yml --vault-pass /tmp/.ansible_vault_pass
+```
+
+Ansible Playbookをシェルから実行する
+```
+# VM環境向け
+cd /app/panic0/ && sudo ansible-playbook -l dev_local -i provision/inventory/default.yml provision/base_setting.yml --vault-pass /tmp/.ansible_vault_pass
+cd /app/panic0/ && sudo ansible-playbook -l dev_local -i provision/inventory/default.yml provision/service_start.yml --vault-pass /tmp/.ansible_vault_pass
+
+# 本番環境向け
+cd /app/panic0/ && sudo ansible-playbook -l prd -i provision/inventory/default.yml provision/base_setting.yml --vault-pass /tmp/.ansible_vault_pass
+cd /app/panic0/ && sudo ansible-playbook -l prd -i provision/inventory/default.yml provision/service_start.yml --vault-pass /tmp/.ansible_vault_pass
 ```
 
 # GCP はswap領域がないので作る

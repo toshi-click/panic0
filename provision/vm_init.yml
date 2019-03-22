@@ -3,6 +3,7 @@
   become: true
   vars_files:
     - ./vars/all.yml
+    - "./vars/{{ stage }}.yml"
   roles:
     - ../roles/all_package_update
     - ../roles/auto_package_upgrade

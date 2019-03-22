@@ -11,9 +11,9 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 cache:
-  # ジョブ毎にキャッシュを共有する設定
-  key: "$CI_JOB_NAME"
-  untracked: true
+  # ブランチ毎にキャッシュする設定
+  key: "$CI_COMMIT_REF_NAME"
+#  untracked: true
   paths:
     - node_modules/
 
@@ -32,21 +32,23 @@ filelint:
   stage: lint
   image: toshiclick/gitlab-ci-ansible-centos
   script:
-    - yum install -y golang
-    - echo export GOROOT=/usr/lib/golang >> ~/.bash_profile
-    - echo export GOPATH=/usr/share/gocode >> ~/.bash_profile
-    - echo export PATH=$PATH:$GOROOT/bin:$GOPATH/bin >> ~/.bash_profile
-    - source ~/.bash_profile
-    - go get -u github.com/synchro-food/filelint
-    - /usr/share/gocode/bin/filelint .
+    - filelint .
 
-htmlhint:
+ansiblelint:
+  stage: lint
+  image: toshiclick/gitlab-ci-ansible-centos
+  script:
+    - pip install ansible-lint
+    - ansible-lint provision/base_setting.yml
+    - ansible-lint provision/service_start.yml
+
+.htmlhint:
   stage: lint
   image: node:latest
   script:
     - npm run htmlhint
 
-stylelint:
+.stylelint:
   stage: lint
   image: node:latest
   script:
@@ -61,11 +63,11 @@ stylelint:
     - git submodule foreach git pull origin master
     - echo -e "$TOSHI_KEY" > /builds/toshi_click/server/panic0/toshi.key
     - chmod 600 /builds/toshi_click/server/panic0/toshi.key
-  #    - echo -e "$VAULT_PASS" > /builds/cs-admin/nw.cs.test/.ansible_vault_pass
+    - echo -e "$VAULT_PASS" > /builds/toshi_click/server/panic0/.ansible_vault_pass
   # サーバへプレイブックを実行
-    - ansible-playbook -l prd -i provision/hosts/panic0.toshi.click.yml provision/11_prd.yml
-    - ansible-playbook -l prd -i provision/hosts/panic0.toshi.click.yml provision/12_prd_service.yml
-  #  - ansible-playbook -l prd2 -i provision/hosts/nw.cs.test.yml provision/12_production_service_start.yml --vault-pass /builds/cs-admin/nw.cs.test/.ansible_vault_pass
-  #  - rm -fr /builds/cs-admin/gitlab_ci/.ansible_vault_pass
+    - ansible-playbook -l prd -i provision/inventory/default.yml provision/base_setting.yml --vault-pass /builds/toshi_click/server/panic0/.ansible_vault_pass
+    - ansible-playbook -l prd -i provision/inventory/default.yml provision/service_start.yml --vault-pass /builds/toshi_click/server/panic0/.ansible_vault_pass
+    - rm -f /builds/toshi_click/server/panic0/toshi.key
+    - rm -f /builds/cs-admin/gitlab_ci/.ansible_vault_pass
   only:
     - master
