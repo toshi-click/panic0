@@ -34,7 +34,7 @@ filelint:
   script:
     - filelint .
 
-ansiblelint:
+.ansiblelint:
   stage: lint
   image: toshiclick/gitlab-ci-ansible-centos
   script:
@@ -55,7 +55,7 @@ ansiblelint:
     - npm run stylelint
 
 # panic0.toshi.clickサーバへデプロイ
-.run_ansible_panic0:
+run_ansible_panic0:
   stage: deploy
   image: toshiclick/gitlab-ci-ansible-centos
   script:
