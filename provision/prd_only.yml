@@ -27,7 +27,7 @@
         owner: root
         group: root
         mode: 0644
-        
+
     - name: Start mackerel-agent
       service:
         name: mackerel-agent
