@@ -16,6 +16,7 @@
     - ../roles/root_user_password
     - ../roles/create_app_dir
     - ../roles/create_bin_dir
+    - ../roles/dev_tool_install
     - ../roles/stdout_to_slack
     - ../roles/timezone
     - ../roles/locale
@@ -27,6 +28,7 @@
     - ../roles/docker
     - ../roles/ntp
     - ../roles/ansible
+    - ../roles/ufw
   tasks:
     # サービス全体の共通設定読み込み
     - name: includes Service ALL variable file.
