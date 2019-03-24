@@ -9,7 +9,7 @@
   roles:
     # docker service コンテナ群起動
 #    - ../roles/docker_compose_service_start
-    - ../roles/cron_register
+#    - ../roles/cron_register
   tasks:
     # サービス全体の共通設定読み込み
     - name: includes Service ALL variable file.
