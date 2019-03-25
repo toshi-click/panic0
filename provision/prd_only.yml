@@ -22,7 +22,7 @@
 
     - name: "set mackerel conf"
       template:
-        src: "mackerel-agent.conf.j2"
+        src: "mackerel-agent.conf"
         dest: "/etc/mackerel-agent/mackerel-agent.conf"
         owner: root
         group: root
