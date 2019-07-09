@@ -1,0 +1,24 @@
+project_root_dir: /c/git
+lets_encrypt_test: "true"
+docker_remote_api_enable: "yes"
+iptables:
+  accept_tcp_rules:
+    - {port: 80}
+    - {port: 443}
+    # Docker Remote API 開発だけ通すようにすること！！！
+    - {port: 2375}
+    - {port: 22, source: 127.0.0.1}
+    - {port: 22, source: 10.0.2.2}
+    - {port: 22, source: 172.16.0.0/12}
+    - {port: 22, source: 192.168.0.0/16}
+    - {port: 25, source: 127.0.0.1}
+    - {port: 25, source: 10.0.2.2}
+    - {port: 25, source: 172.16.0.0/12}
+    - {port: 25, source: 192.168.0.0/16}
+    - {port: 24224, source: 127.0.0.1}
+    - {port: 24224, source: 172.16.0.0/12}
+    - {port: 24224, source: 192.168.0.0/16}
+  accept_udp_rules:
+    - {port: 161, source: 127.0.0.1}
+  deny_tcp_rules: ""
+  deny_udp_rules: ""

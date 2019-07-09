@@ -1,0 +1,90 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - vars/all.yml
+    - vars/crypt_vars.yml
+    - "vars/{{ stage }}.yml"
+  tasks:
+    # manageユーザーでdocker使えるようにする。セキュリティ落ちるので本番サーバーでは設定しないように。
+    - name: user join to docker group
+      user:
+        name: "{{ manage_user.name }}"
+        append: yes
+        groups: docker
+      when: stage == "dev"
+
+    - name: custom td-agent.conf set
+      template:
+        src: "td-agent.conf"
+        dest:  /etc/td-agent/td-agent.conf
+        owner: root
+        group: root
+        mode: 0644
+
+    # postfix関連の設定を行う
+    - name: main.cf set
+      template:
+        src: "main.cf"
+        dest: /etc/postfix/main.cf
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: aliases set
+      template:
+        src: "aliases"
+        dest: /etc/aliases
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: "postalias"
+      shell: bash -lc "postalias /etc/aliases"
+    - name: "newaliases"
+      shell: bash -lc "newaliases"
+
+    - name: systemd set state fluentd
+      service:
+        name: td-agent
+        state: restarted
+        enabled: yes
+
+    - name: systemd set state mackerel-agent
+      service:
+        name: mackerel-agent
+        state: restarted
+        enabled: yes
+
+    - name: systemd set state postfix
+      service:
+        name: postfix
+        state: restarted
+        enabled: yes
+
+    - name: systemd set state docker
+      service:
+        name: docker
+        state: restarted
+        enabled: yes
+
+    - name: crontab_file set
+      template:
+        src: "crontab"
+        dest: "/root/crontab_file"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: "set mackerel conf"
+      template:
+        src: "mackerel-agent.conf"
+        dest: "/etc/mackerel-agent/mackerel-agent.conf"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: "file to cron register"
+      shell: bash -lc "crontab /root/crontab_file"
+
+- import_playbook: ./rootkit.yml

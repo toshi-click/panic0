@@ -1,0 +1,66 @@
+# このプロジェクトが設置される親ディレクトリ
+project_root_dir: /app
+
+# 証明書ファイルの場所
+project_cert_dir: "{{ project_root_dir }}/certs"
+
+# リポジトリに登録されていない汎用スクリプトの設置ディレクトリの場所定義
+script_dir: "{{ project_root_dir }}/scripts"
+
+# hosts.allowに設定する開放パス
+hosts_accept_protocol_address:
+  # local
+  - {protocol: sshd, ip: 127.0.0.1}
+  - {protocol: snmpd, ip: 127.0.0.1}
+  # local
+  - {protocol: sshd, ip: 192.168.0.0/16}
+  - {protocol: sshd, ip: 172.16.0.0/12}
+  # CS
+  - {protocol: sshd, ip: "122.249.226.152/29"}
+  # Home
+  - {protocol: sshd, ip: 61.213.68.235}
+
+# SSHログイン時にメール送付しないグローバルIP
+# IPは正規表現でマッチ。接続元IPがここで定義したip正規表現と一致すればメールが送られない
+ssh_mail_send: "true"
+ssh_mail_send_trust_list_file: /usr/local/ssh_mail_send_trust_list
+ssh_mail_send_no_send_ip_list:
+  - {ip: 127.0.0.1}
+  - {ip: 192.168.}
+  - {ip: 172.16.}
+  # 自宅IP
+  - {ip: 61.213.68.235}
+  # 会社IP
+  - {ip: 122.249.226.}
+
+fluentd_user: root
+fluentd_group: root
+
+# プロジェクト固有の識別名（リポジトリ名。サーバ上のファイル位置の指定などに使用。ドメインは別で定義する）
+project_name: "panic0"
+project_dir: "{{ project_root_dir }}/{{ project_name }}"
+machine_hostname: "{{ project_name }}.toshi.click"
+hosts:
+  # /etc/hostsに設定するホスト情報
+  etc_hosts_setting:
+    - {name: "{{ machine_hostname }}", ip: 127.0.0.1}
+
+# 共通ユーザ
+# パスワード生成は「python -c 'import crypt; print crypt.crypt("password", "$6$toshitoshi$")'」
+manage_user:
+  name: toshi
+  password: "{{ manage_user_pass }}"
+  group: toshi
+  subgroups: sudo
+
+# パスワード生成は「python -c 'import crypt; print crypt.crypt("[user_password]", "$6$[your_salt]$")'」
+root_user:
+  name: root
+  password: "{{ root_user_pass }}"
+
+# Slackチャンネルの情報
+slack_channel: "panic0"
+slack_icon: ":mayu1:"
+
+sudo_nopassword: "true"
+main_domain_name: "vm.{{ project_name }}"

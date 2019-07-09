@@ -1,6 +1,5 @@
 # CI Lint tool
 # https://gitlab.teamhack.io/ci/lint
----
 stages:
   - pre-build
   - lint
@@ -16,6 +15,20 @@ cache:
 #  untracked: true
   paths:
     - node_modules/
+
+.deploy_default: &deploy_default
+  #  stage: deploy
+  image: toshiclick/gitlab-ci-ansible-centos
+  before_script:
+    # リモートの最新に追従
+    - git submodule foreach git pull origin master
+    - echo -e "$TOSHI_KEY" > /tmp/key
+    - chmod 600 /tmp/key
+    - echo -e "$VAULT_PASS" > /tmp/.ansible_vault_pass
+    - chmod 644 /tmp/.ansible_vault_pass
+  after_script:
+    - rm -f /tmp/key
+    - rm -f /tmp/.ansible_vault_pass
 
 pre-npm-build:
   stage: pre-build
@@ -56,18 +69,18 @@ filelint:
 # panic0.toshi.clickサーバへデプロイ
 run_ansible_panic0:
   stage: deploy
-  image: toshiclick/gitlab-ci-ansible-centos
+  <<: *deploy_default
   script:
-    # リモートの最新に追従
-    - git submodule foreach git pull origin master
-    - echo -e "$TOSHI_KEY" > /builds/toshi_click/server/panic0/toshi.key
-    - chmod 600 /builds/toshi_click/server/panic0/toshi.key
-    - echo -e "$VAULT_PASS" > /builds/toshi_click/server/panic0/.ansible_vault_pass
+    - ansible-playbook -l main_server -i inventory/default.yml main.yml
+    - ansible-playbook -l main_server -i inventory/default.yml panic0.yml
   # サーバへプレイブックを実行
-    - ansible-playbook -l prd -i provision/inventory/default.yml provision/base_setting.yml --vault-pass /builds/toshi_click/server/panic0/.ansible_vault_pass
+#    - ansible-playbook -l prd -i provision/inventory/default.yml provision/base_setting.yml --vault-pass /builds/toshi_click/server/panic0/.ansible_vault_pass
 #    - ansible-playbook -l prd -i provision/inventory/default.yml provision/service_start.yml --vault-pass /builds/toshi_click/server/panic0/.ansible_vault_pass
-    - ansible-playbook -l prd -i provision/inventory/default.yml provision/prd_only.yml --vault-pass /builds/toshi_click/server/panic0/.ansible_vault_pass
-    - rm -f /builds/toshi_click/server/panic0/toshi.key
-    - rm -f /builds/cs-admin/gitlab_ci/.ansible_vault_pass
+#    - ansible-playbook -l prd -i provision/inventory/default.yml provision/prd_only.yml --vault-pass /builds/toshi_click/server/panic0/.ansible_vault_pass
   only:
-    - master
+    # 実行されるブランチを指定
+    refs:
+      - master
+    variables:
+      # 環境変数RELEASE_FLAGがあるときだけ実行(スケジュールCIのスタートボタンを押したときだけ実行されるように)
+      - $RELEASE_FLAG

@@ -1,0 +1,22 @@
+lets_encrypt_test: "false"
+docker_remote_api_enable: "no"
+main_domain_name: "{{ project_name }}"
+iptables:
+  accept_tcp_rules:
+    - {port: 80}
+    - {port: 443}
+    - {port: 22, source: 127.0.0.1}
+    # CS
+    - {port: 22, source: 122.249.226.152/29}
+    # Home
+    - {port: 22, source: 61.213.68.235}
+    - {port: 25, source: 127.0.0.1}
+    - {port: 25, source: 172.16.0.0/12}
+    - {port: 25, source: 192.168.0.0/16}
+    - {port: 24224, source: 127.0.0.1}
+    - {port: 24224, source: 172.16.0.0/12}
+    - {port: 24224, source: 192.168.0.0/16}
+  accept_udp_rules:
+    - {port: 161, source: 127.0.0.1}
+  deny_tcp_rules: ""
+  deny_udp_rules: ""

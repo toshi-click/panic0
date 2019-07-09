@@ -1,0 +1,30 @@
+# サービス固有の設定を実行
+- hosts: all
+  become: true
+  vars_files:
+    - vars/all.yml
+    - vars/crypt_vars.yml
+    - "vars/{{ stage }}.yml"
+  roles:
+    - { role: "roles/manage_user_create", when: stage != "dev"}
+    - { role: "roles/root_user_password", when: stage != "dev"}
+    - { role: "roles/all_package_update"}
+    - { role: "roles/auto_package_upgrade"}
+    - { role: "roles/timezone", when: stage != "dev"}
+    - { role: "roles/locale", when: stage != "dev"}
+    - { role: "roles/dev_tool_install", when: stage != "dev"}
+    - { role: "roles/docker", when: stage != "dev"}
+    - { role: "roles/ansible", when: stage != "dev"}
+    - { role: "roles/sshd", when: stage != "dev"}
+    - { role: "roles/ufw", when: stage != "dev"}
+    - { role: "roles/hosts", when: stage != "dev"}
+    - { role: "roles/rootkit_hunter", when: stage != "dev"}
+    - { role: "roles/node_exporter", when: stage != "dev"}
+    - { role: "roles/ntp", when: stage != "dev"}
+    - { role: "roles/secure", when: stage != "dev"}
+    - { role: "roles/postfix", when: stage != "dev"}
+    - { role: "roles/stdout_to_slack_script", when: stage != "dev"}
+    - { role: "roles/ssh_mail_send", when: stage != "dev"}
+    - { role: "roles/hostname", when: stage != "dev"}
+    - { role: "roles/fluentd", when: stage != "dev"}
+    - { role: "roles/mackerel", when: stage != "dev"}
