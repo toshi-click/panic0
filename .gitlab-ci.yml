@@ -41,7 +41,7 @@ pre-npm-build:
       - vendor/
 
 ## filelint 改行コードを見たりする
-filelint:
+.filelint:
   stage: lint
   image: toshiclick/gitlab-ci-ansible-centos
   script:
