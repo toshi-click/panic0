@@ -16,7 +16,7 @@
     - { role: "roles/docker", when: stage != "dev"}
     - { role: "roles/ansible", when: stage != "dev"}
     - { role: "roles/sshd", when: stage != "dev"}
-    - { role: "roles/ufw", when: stage != "dev"}
+    - { role: "roles/firewall", when: stage != "dev"}
     - { role: "roles/hosts", when: stage != "dev"}
     - { role: "roles/rootkit_hunter", when: stage != "dev"}
     - { role: "roles/node_exporter", when: stage != "dev"}
